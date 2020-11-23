@@ -1,0 +1,20 @@
+{
+  "name": "extensiontest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "background_script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^7.14.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  },
+  "webExt":{
+    "run":{"firefox":"nightly"}
+  }
+}
