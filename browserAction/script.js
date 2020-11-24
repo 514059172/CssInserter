@@ -1,13 +1,17 @@
 /* eslint-disable no-undef */
-const applyStoreButton = document.getElementsById('applyStore');
+const applyStoreButton = document.getElementById('applyStore');
 const storeButton = document.getElementById('store');
+const applyButton = document.getElementById('apply');
 const titleInput = document.getElementById('title');
 const cssInput = document.getElementById('content');
 const BUTTON_CONTENT_A = `Apply CSS`;
 const BUTTON_CONTENT_B = `Remove CSS`;
 const defaultText = `Please input some css code`;
-// let cssContent = cssTextarea.value;
-let cssContent = 'body{border:5px solid red;}';
+
+let entryObject = {
+  title: titleInput,
+  cssCode: cssInput,
+};
 
 function onError(e) {
   console.log(e);
@@ -22,9 +26,9 @@ function init() {
   }, onError);
 }
 
-function apply(cssObject) {
+function apply(entryObject) {
   // not consider the situation duplicate
-  browser.tabs.insertCSS({ code: cssObject[cssCode] });
+  browser.tabs.insertCSS({ code: entryObject.cssCode.value });
 }
 
 function enableButton() {
@@ -32,39 +36,57 @@ function enableButton() {
   if (titleInput.value !== '' && cssInput.value !== '') {
     applyStoreButton.disabled = false;
     storeButton.disabled = false;
+    applyButton.disabled = false;
   } else {
     applyStoreButton.disabled = true;
     storeButton.disabled = true;
+    applyButton.disabled = true;
   }
 }
 
-function addEntry() {
+function addEntry(entryObject) {
   // run when user click store button.
   // 判断输入的title是否重如果重复则不添加
   // 待完善提醒用户输入重复.
-  let entry = { title: titleInput.value, cssCode: cssInput.value };
-  let gettingItem = browser.storage.local.get(titleInput);
+  const gettingItem = browser.storage.local.get(entryObject.title.value);
+  debugger
   gettingItem.then((result) => {
     let resultKeys = Object.keys(result);
     if (resultKeys.length < 1) {
+      storeEntry(entryObject);
       titleInput.value = '';
       cssInput.value = '';
-      storeEntry(entry);
+    } else {
+      console.log('entry duplicate');
     }
   }, onError);
 }
 
-button.addEventListener('click', () => {
-  if (button.textContent === BUTTON_CONTENT_A) {
-    browser.tabs.insertCSS({ code: cssContent });
-    button.textContent = BUTTON_CONTENT_B;
-  } else {
-    browser.tabs.removeCSS({ code: cssContent });
-    button.textContent = BUTTON_CONTENT_A;
-  }
+function storeEntry(entryObject) {
+  storingEntry = browser.storage.local.set({
+    [entryObject.title.value]: entryObject.cssCode.value,
+  });
+  storingEntry.then(() => {
+    display(entryObject);
+  }, onError);
+}
+
+function display(entryObject) {}
+storeButton.addEventListener('click', () => {
+  addEntry(entryObject);
 });
-cssTextarea.addEventListener('click', (e) => {
+applyButton.addEventListener('click', () => {
+  apply(entryObject);
+});
+applyStoreButton.addEventListener('click', () => {
+  apply(entryObject);
+  addEntry(entryObject);
+});
+cssInput.addEventListener('input', enableButton);
+titleInput.addEventListener('input', enableButton);
+cssInput.addEventListener('click', (e) => {
   if (e.target.textContent === defaultText) {
     e.target.textContent = '';
   }
 });
+enableButton();
