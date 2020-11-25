@@ -14,7 +14,7 @@ let entryObject = {
 };
 
 function onError(e) {
-  console.log(e);
+  console.log(`get a error ${e}`);
 }
 
 function init() {
@@ -49,10 +49,9 @@ function addEntry(entryObject) {
   // 判断输入的title是否重如果重复则不添加
   // 待完善提醒用户输入重复.
   const gettingItem = browser.storage.local.get(entryObject.title.value);
-  debugger
   gettingItem.then((result) => {
-    let resultKeys = Object.keys(result);
-    if (resultKeys.length < 1) {
+    let resultKeys = Object.keys(result); //get the property number of the result object
+    if (resultKeys.length == 0) {
       storeEntry(entryObject);
       titleInput.value = '';
       cssInput.value = '';
