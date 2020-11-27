@@ -29,7 +29,7 @@ cssInput.addEventListener('click', (e) => {
   }
 });
 enableButton();
-
+init();
 function onError(e) {
   console.log(`get a error ${e}`);
 }
@@ -37,8 +37,9 @@ function onError(e) {
 function init() {
   let gettingAllStorageItems = browser.storage.local.get(null);
   gettingAllStorageItems.then((result) => {
-    for (let i of result) {
-      display(i);
+    resultKeys = Object.keys(result);
+    for (let i of resultKeys) {
+      display({ titleValue: i, cssCodeValue: result[i] });
     }
   }, onError);
 }
@@ -80,8 +81,8 @@ function addEntry(entryObject) {
 
 function storeEntry(entryObject) {
   const objectCopy = {
-  titleValue: entryObject.title.value,
-  cssCodeValue:entryObject.cssCode.value,
+    titleValue: entryObject.title.value,
+    cssCodeValue: entryObject.cssCode.value,
   };
   storingEntry = browser.storage.local.set({
     [entryObject.title.value]: entryObject.cssCode.value,
@@ -91,18 +92,18 @@ function storeEntry(entryObject) {
   }, onError);
 }
 
-function display(entryObject) {
+function display(entryValueObject) {
   const unorderedList = document.createElement('ul');
   const entryDiv = document.createElement('div');
   const listItem = document.createElement('li');
-  const titleDisplayArea = document.createElement('h2');
-  const cssCodeDisplayArea = document.createElement('code');
+  let titleDisplayArea = document.createElement('h2');
+  let cssCodeDisplayArea = document.createElement('code');
   const titleEditArea = document.createElement('input');
   const cssCodeEditArea = document.createElement('textarea');
   const deleteButton = document.createElement('button');
 
-  titleDisplayArea.textContent = entryObject.titleValue;
-  cssCodeDisplayArea.textContent = entryObject.cssCodeValue;
+  titleDisplayArea.textContent = entryValueObject.titleValue;
+  cssCodeDisplayArea.textContent = entryValueObject.cssCodeValue;
   deleteButton.textContent = `delete`;
   unorderedList.appendChild(listItem);
   listItem.appendChild(entryDiv);
@@ -110,4 +111,26 @@ function display(entryObject) {
   entryDiv.appendChild(cssCodeDisplayArea);
   entryDiv.appendChild(deleteButton);
   document.body.appendChild(unorderedList);
+
+  titleDisplayArea.addEventListener('click', editEntry);
+  cssCodeDisplayArea.addEventListener('click', editEntry);
+
+  function editEntry() {
+    titleDisplayArea.style.display = 'none';
+    cssCodeDisplayArea.style.display = 'none';
+    titleEditArea.value = titleDisplayArea.textContent;
+    cssCodeEditArea.value = titleDisplayArea.textContent;
+    entryDiv.insertBefore(titleEditArea, deleteButton);
+    entryDiv.insertBefore(cssCodeEditArea, deleteButton);
+    
+  }
+  function deleteEntry() {
+    const removing = browser.storage.local.remove(titleDisplayArea.textContent);
+    removing.then(
+      () => console.log(`success to remove`),
+      () => console.log(`remove from storage failed`)
+    );
+    listItem.remove();
+  }
+  deleteButton.addEventListener('click', deleteEntry);
 }

@@ -10,7 +10,7 @@
             "reloadOnChange": {
                 "watch": "${workspaceFolder}/**/*.js",
                 "ignore": "**/node_modules/**"
-            }
+            },
         }
     ]
 }
