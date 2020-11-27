@@ -25,7 +25,6 @@
     "default_icon": {
       "64": "icons/icon.png"
     },
-    "default_popup": "browserAction/index.html",
     "default_title": "Test"
   },
   "page_action": {
